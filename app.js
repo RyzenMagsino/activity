@@ -1,45 +1,62 @@
-const title = document.getElementById('songTitle');
-const artist = document.getElementById('songArtist');
-const addBtn = document.getElementById('addSongBtn');
-const ul = document.getElementById('songList');
+document.addEventListener('DOMContentLoaded', function () {
+    const songList = document.getElementById('song-items');
+    const addSongForm = document.getElementById('add-song-form');
+    const songNameInput = document.getElementById('song-name');
+    const songArtistInput = document.getElementById('song-artist');
+    const searchInput = document.getElementById('search-input');
 
-addBtn.addEventListener('click', ()=>{
-    //Get value from input form
-    const newTitle = title.value;
-    const newArtist = artist.value;
+    // Function to add a song to the list
+    function addSongToList(songName, songArtist) {
+        const newSongItem = document.createElement('li');
+        newSongItem.innerHTML = `
+            <span class="song">${songName}</span>
+            <span class="artist">${songArtist}</span>
+            <button class="delete">Delete</button>
+        `;
 
-    //create element
-    const h4 = document.createElement('h4');
-    const small = document.createElement('small');
+        // Add delete functionality to each song
+        const deleteButton = newSongItem.querySelector('.delete');
+        deleteButton.addEventListener('click', function () {
+            songList.removeChild(newSongItem);
+        });
 
+        songList.appendChild(newSongItem);
+    }
 
-    //set value to the element
-    h4.innerHTML = newTitle;
-    small.innerHTML = newArtist;
+    // Add song event
+    addSongForm.addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent form submission
 
-    //add class to the element
-    h4.classList.add('mb-1')
-    small.classList.add('text-muted')
+        const songName = songNameInput.value.trim();
+        const songArtist = songArtistInput.value.trim();
 
-    //create container
-    const div = document.createElement('div');
-    const div1 = document.createElement('div');
-    div1.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center')
-    div.append(h4);
-    div.append(small);
+        if (songName === '' || songArtist === '') {
+            alert('Please enter both the song title and the artist.');
+            return;
+        }
 
-    div1.append(div)
+        addSongToList(songName, songArtist);
 
+        // Clear input fields after adding
+        songNameInput.value = '';
+        songArtistInput.value = '';
+    });
 
-    const li = document.createElement('li');
-    li.append(div1);
+    // Search functionality
+    searchInput.addEventListener('input', function () {
+        const filter = searchInput.value.toLowerCase();
+        const songs = songList.querySelectorAll('li');
 
-    //append to list
+        songs.forEach(function (song) {
+            const songName = song.querySelector('.song').textContent.toLowerCase();
+            const songArtist = song.querySelector('.artist').textContent.toLowerCase();
 
-    ul.append(li);
-
-    console.log(li)
-})
-
-
-console.log(title,artist)
+            // Check if the song name or artist matches the search input
+            if (songName.includes(filter) || songArtist.includes(filter)) {
+                song.style.display = ''; // Show matching songs
+            } else {
+                song.style.display = 'none'; // Hide non-matching songs
+            }
+        });
+    });
+});
